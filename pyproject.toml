@@ -15,4 +15,5 @@ dependencies = [
     "python-bitcoinlib>=0.12.2",
     "qrcode>=8.2",
     "cryptography>=45.0.5",
+    "base58>=2.1.1",
 ]

@@ -5,6 +5,7 @@ import hashlib
 import base64
 import os
 import secrets
+import base58
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization, hashes
@@ -52,7 +53,7 @@ class CryptoManager:
         checksum = hashlib.sha256(hashlib.sha256(versioned).digest()).digest()[:4]
         
         # Encode as base58
-        address = base64.b58encode(versioned + checksum).decode()
+        address = base58.b58encode(versioned + checksum).decode()
         return address
     
     def sign_message(self, private_key_pem, message):

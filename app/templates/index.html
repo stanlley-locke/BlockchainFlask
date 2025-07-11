@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coinium Blockchain Network</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-cube me-2"></i>Coinium Network
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="navbar-text me-3">
+                        <span id="connection-status" class="badge bg-success">
+                            <i class="fas fa-wifi me-1"></i>Connected
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Dashboard Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-white-50">Total Blocks</h6>
+                                <h3 class="card-text text-white" id="total-blocks">
+                                    {{ blockchain_stats.total_blocks if blockchain_stats else 0 }}
+                                </h3>
+                            </div>
+                            <div class="text-white-50">
+                                <i class="fas fa-cubes fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-white-50">Transactions</h6>
+                                <h3 class="card-text text-white" id="total-transactions">
+                                    {{ blockchain_stats.total_transactions if blockchain_stats else 0 }}
+                                </h3>
+                            </div>
+                            <div class="text-white-50">
+                                <i class="fas fa-exchange-alt fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-white-50">Network Peers</h6>
+                                <h3 class="card-text text-white" id="peer-count">
+                                    {{ network_status.node_info.peer_count if network_status and network_status.node_info else 0 }}
+                                </h3>
+                            </div>
+                            <div class="text-white-50">
+                                <i class="fas fa-network-wired fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-white-50">Mining Difficulty</h6>
+                                <h3 class="card-text text-white" id="difficulty">
+                                    {{ blockchain_stats.current_difficulty if blockchain_stats else 4 }}
+                                </h3>
+                            </div>
+                            <div class="text-white-50">
+                                <i class="fas fa-hammer fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Management -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-wallet me-2"></i>Wallet Management
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-primary me-2" onclick="createWallet()">
+                                <i class="fas fa-plus me-1"></i>Create Wallet
+                            </button>
+                            <button class="btn btn-secondary" onclick="recoverWallet()">
+                                <i class="fas fa-key me-1"></i>Recover Wallet
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="wallet-address" class="form-label">Wallet Address</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="wallet-address" placeholder="Enter wallet address">
+                                <button class="btn btn-outline-secondary" onclick="checkBalance()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="wallet-info" class="d-none">
+                            <div class="alert alert-info">
+                                <strong>Balance:</strong> <span id="wallet-balance">0.00000000</span> COIN<br>
+                                <strong>Staked:</strong> <span id="wallet-staked">0.00000000</span> COIN
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-paper-plane me-2"></i>Send Transaction
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="transaction-form">
+                            <div class="mb-3">
+                                <label for="tx-sender" class="form-label">From Address</label>
+                                <input type="text" class="form-control" id="tx-sender" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tx-recipient" class="form-label">To Address</label>
+                                <input type="text" class="form-control" id="tx-recipient" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tx-amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="tx-amount" step="0.00000001" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tx-private-key" class="form-label">Private Key</label>
+                                <input type="password" class="form-control" id="tx-private-key" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-send me-1"></i>Send Transaction
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mining Control -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-hammer me-2"></i>Mining Control
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="miner-address" class="form-label">Miner Address</label>
+                            <input type="text" class="form-control" id="miner-address" placeholder="Enter miner wallet address">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="startMining()">
+                                <i class="fas fa-play me-1"></i>Start Mining
+                            </button>
+                            <button class="btn btn-danger" onclick="stopMining()">
+                                <i class="fas fa-stop me-1"></i>Stop Mining
+                            </button>
+                        </div>
+                        <div id="mining-status" class="mt-3 d-none">
+                            <div class="alert alert-info">
+                                <strong>Status:</strong> <span id="mining-status-text">Idle</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Network Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Hash Rate</h6>
+                                    <h4 id="hash-rate">{{ "%.2f"|format(blockchain_stats.hash_rate) if blockchain_stats else "0.00" }} H/s</h4>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Mempool Size</h6>
+                                    <h4 id="mempool-size">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Healthy Peers</h6>
+                                    <h4 id="healthy-peers">
+                                        {{ network_status.health_stats.healthy_peers if network_status and network_status.health_stats else 0 }}
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Avg Latency</h6>
+                                    <h4 id="avg-latency">
+                                        {{ "%.0f"|format(network_status.health_stats.average_latency * 1000) if network_status and network_status.health_stats else "0" }}ms
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Recent Transactions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Hash</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Amount</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactions-table">
+                                    {% if recent_transactions %}
+                                        {% for tx in recent_transactions %}
+                                        <tr>
+                                            <td><span class="font-monospace">{{ tx[0][:12] }}...</span></td>
+                                            <td><span class="font-monospace">{{ tx[1][:12] }}...</span></td>
+                                            <td><span class="font-monospace">{{ tx[2][:12] }}...</span></td>
+                                            <td>{{ "%.8f"|format(tx[3]) }}</td>
+                                            <td>{{ moment(tx[4]).format('MMM DD, HH:mm') }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No recent transactions</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Create Wallet Modal -->
+    <div class="modal fade" id="createWalletModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Wallet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-wallet-form">
+                        <div class="mb-3">
+                            <label for="wallet-password" class="form-label">Password (Optional)</label>
+                            <input type="password" class="form-control" id="wallet-password">
+                            <div class="form-text">Leave empty for unencrypted wallet</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCreateWallet()">Create Wallet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recover Wallet Modal -->
+    <div class="modal fade" id="recoverWalletModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Recover Wallet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="recover-wallet-form">
+                        <div class="mb-3">
+                            <label for="seed-phrase" class="form-label">Seed Phrase</label>
+                            <textarea class="form-control" id="seed-phrase" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recover-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="recover-password">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitRecoverWallet()">Recover Wallet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.5/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

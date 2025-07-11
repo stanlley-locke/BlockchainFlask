@@ -1,0 +1,368 @@
+/* Coinium Blockchain Network - Custom Styles */
+
+/* Variables for consistent theming */
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --dark-color: #212529;
+    --light-color: #f8f9fa;
+    --crypto-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --mining-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    --network-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    --border-radius: 0.5rem;
+    --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --transition: all 0.15s ease-in-out;
+}
+
+/* Global styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    line-height: 1.6;
+}
+
+/* Card enhancements */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Navbar customization */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-brand i {
+    background: var(--crypto-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Button styles */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: var(--crypto-gradient);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    border: none;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    border: none;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+    border: none;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+    border: none;
+}
+
+/* Dashboard cards */
+.card.bg-primary {
+    background: var(--crypto-gradient) !important;
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%) !important;
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%) !important;
+}
+
+/* Form controls */
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Table styles */
+.table {
+    --bs-table-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.025);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+}
+
+.table th {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--light-color);
+    font-weight: 600;
+}
+
+.table td {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--light-color);
+}
+
+/* Badge styles */
+.badge {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%) !important;
+}
+
+/* Progress bars */
+.progress {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+}
+
+.progress-bar {
+    background: var(--crypto-gradient);
+    border-radius: var(--border-radius);
+}
+
+/* Modal styles */
+.modal-content {
+    background: rgba(33, 37, 41, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* List group styles */
+.list-group-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--light-color);
+}
+
+.list-group-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Alert styles */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(86, 171, 47, 0.2) 0%, rgba(168, 230, 207, 0.2) 100%);
+    border: 1px solid rgba(86, 171, 47, 0.3);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(253, 121, 168, 0.2) 0%, rgba(232, 67, 147, 0.2) 100%);
+    border: 1px solid rgba(253, 121, 168, 0.3);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(116, 185, 255, 0.2) 0%, rgba(9, 132, 227, 0.2) 100%);
+    border: 1px solid rgba(116, 185, 255, 0.3);
+}
+
+/* Crypto-specific styles */
+.crypto-hash {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #74b9ff;
+}
+
+.crypto-address {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #a29bfe;
+}
+
+.mining-indicator {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Network status indicators */
+.network-status {
+    position: relative;
+    display: inline-block;
+}
+
+.network-status::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(86, 171, 47, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-responsive {
+        border: none;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--crypto-gradient);
+    border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
+}
+
+/* System logs */
+.log-entry {
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+    border-left: 3px solid var(--primary-color);
+    padding-left: 0.5rem;
+}
+
+.log-entry:last-child {
+    margin-bottom: 0;
+}
+
+/* Utility classes */
+.text-crypto {
+    background: var(--crypto-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-crypto {
+    background: var(--crypto-gradient);
+}
+
+.border-crypto {
+    border: 1px solid var(--primary-color);
+}
+
+.shadow-crypto {
+    box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
+}
+

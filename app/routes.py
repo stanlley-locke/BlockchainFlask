@@ -178,6 +178,49 @@ def unstake_coins():
         logging.error(f"Error unstaking coins: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/wallet/fund', methods=['POST'])
+def fund_wallet():
+    """Fund wallet for testing purposes"""
+    try:
+        data = request.get_json()
+        wallet_address = data.get('address')
+        amount = data.get('amount', 1000)  # Default 1000 coins
+        
+        # Validate wallet address
+        if not wallet_address:
+            return jsonify({
+                'success': False,
+                'error': 'Wallet address is required'
+            }), 400
+        
+        # Check if wallet exists
+        balance = wallet_manager.get_wallet_balance(wallet_address)
+        if balance is None:
+            return jsonify({
+                'success': False,
+                'error': 'Wallet not found'
+            }), 404
+        
+        # Update wallet balance
+        new_balance = balance + amount
+        success = wallet_manager.update_wallet_balance(wallet_address, new_balance)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Funded {amount} coins to wallet {wallet_address}',
+                'new_balance': new_balance
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to fund wallet'
+            }), 400
+            
+    except Exception as e:
+        logging.error(f"Error funding wallet: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # Transaction Routes
 @app.route('/api/transaction/create', methods=['POST'])
 def create_transaction():

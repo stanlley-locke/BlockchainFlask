@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Socket.IO initialization
 function initializeSocket() {
+    if (typeof io === 'undefined' || window.socketFallback) {
+        console.warn('Socket.IO not available, real-time features disabled');
+        return;
+    }
+    
     socket = io();
     
     socket.on('connect', function() {
@@ -392,6 +397,46 @@ function updateMiningStatus(status, type) {
         statusElement.className = `mt-3 alert alert-${type}`;
         statusElement.classList.remove('d-none');
     }
+}
+
+// Fund wallet for testing
+function fundWallet() {
+    const address = document.getElementById('wallet-address').value;
+    if (!address) {
+        showNotification('Please enter a wallet address first', 'warning');
+        return;
+    }
+
+    const amount = prompt('Enter amount to fund (default: 1000):', '1000');
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+        showNotification('Invalid amount', 'warning');
+        return;
+    }
+
+    fetch('/api/wallet/fund', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            address: address,
+            amount: parseFloat(amount)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(`Successfully funded ${amount} coins to wallet!`, 'success');
+            // Auto-refresh balance
+            checkBalance();
+        } else {
+            showNotification(data.error || 'Failed to fund wallet', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error funding wallet', 'danger');
+    });
 }
 
 // Update transaction table

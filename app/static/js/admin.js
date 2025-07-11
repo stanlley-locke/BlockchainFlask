@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Socket.IO initialization
 function initializeSocket() {
+    if (typeof io === 'undefined' || window.socketFallback) {
+        console.warn('Socket.IO not available, real-time features disabled');
+        return;
+    }
+    
     socket = io();
     
     socket.on('connect', function() {

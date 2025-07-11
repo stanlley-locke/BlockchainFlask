@@ -183,6 +183,11 @@ function submitCreateWallet() {
             showNotification('Wallet created successfully!', 'success');
             displayWalletInfo(data.wallet);
             
+            // Show seed phrase if provided
+            if (data.wallet.seed_phrase) {
+                showSeedPhraseModal(data.wallet.seed_phrase);
+            }
+            
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('createWalletModal'));
             modal.hide();
@@ -193,6 +198,78 @@ function submitCreateWallet() {
     .catch(error => {
         console.error('Error:', error);
         showNotification('Error creating wallet', 'danger');
+    });
+}
+
+// Also add alias to match any HTML references
+function handleCreateWalletSubmit() {
+    submitCreateWallet();
+}
+
+function handleRecoverWalletSubmit() {
+    submitRecoverWallet();
+}
+
+function showSeedPhraseModal(seedPhrase) {
+    // Create a modal to show the seed phrase
+    const modalHtml = `
+        <div class="modal fade" id="seedPhraseModal" tabindex="-1" aria-labelledby="seedPhraseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="seedPhraseModalLabel">Your Seed Phrase</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> Write down your seed phrase and store it safely. You'll need it to recover your wallet.
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="card-text font-monospace text-center" style="font-size: 1.1em; line-height: 1.6;">
+                                    ${seedPhrase}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button type="button" class="btn btn-outline-primary" onclick="copyToClipboard('${seedPhrase}')">
+                                <i class="fas fa-copy me-1"></i>Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">I've Saved It</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if present
+    const existingModal = document.getElementById('seedPhraseModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('seedPhraseModal'));
+    modal.show();
+    
+    // Remove modal from DOM when hidden
+    document.getElementById('seedPhraseModal').addEventListener('hidden.bs.modal', function () {
+        this.remove();
+    });
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        showNotification('Seed phrase copied to clipboard!', 'success');
+    }, function(err) {
+        showNotification('Failed to copy to clipboard', 'warning');
     });
 }
 

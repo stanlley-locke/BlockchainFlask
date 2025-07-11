@@ -3,6 +3,7 @@ Socket.IO event handlers for real-time updates
 """
 import logging
 from flask_socketio import emit, join_room, leave_room, disconnect
+from flask import request
 from . import socketio
 from network.network_manager import network_manager
 from core.block_ops import block_operations
@@ -11,13 +12,13 @@ from core.transactions import transaction_manager
 @socketio.on('connect')
 def handle_connect():
     """Handle client connection"""
-    logging.info(f"Client connected: {request.sid}")
+    logging.info(f"Client connected")
     emit('connected', {'status': 'Connected to Coinium Network'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
     """Handle client disconnection"""
-    logging.info(f"Client disconnected: {request.sid}")
+    logging.info(f"Client disconnected")
 
 @socketio.on('join_room')
 def handle_join_room(data):

@@ -11,7 +11,7 @@ import requests
 from colorama import Fore, Style, init
 import traceback
 
-from p2pnetworking2 import (
+from p2pnetworkingv3 import (
     start_network_services, PEERS, PEER_SCORES, PEER_LATENCIES,
     gossip_message, MessagePriority, get_metrics, add_peer, remove_peer,
     list_peers, save_peers, load_peers, broadcast_peer_list, ping_peers,
@@ -79,6 +79,7 @@ MIN_STAKE = 1000  # Minimum coins to stake
 MEMPOOL_KEY_ROTATION_INTERVAL = 3600  # 1 hour
 SYNC_INTERVAL = 300  # 5 minutes for periodic sync
 SNAPSHOT_INTERVAL = 100  # Blocks between snapshots
+LOCAL_ADDRESS = socket.gethostbyname(socket.gethostname())
 
 
 # ============== DATABASE SETUP ==============
@@ -710,9 +711,9 @@ def apply_sync_data(table, data):
 
 
 # ============== CRYPTO FUNCTIONS ==============
-rate_key_pair():
+def generate_key_pair():
     private_key = ec.generate_private_key(ec.SECP256K1(), default_backend())
-    publicdef gene_key = private_key.public_key()
+    public_key = private_key.public_key()
     return private_key, public_key
 
 def encrypt_private_key(private_bytes: bytes, password: str, salt: str) -> str:

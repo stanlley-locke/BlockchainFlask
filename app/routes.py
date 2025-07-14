@@ -189,82 +189,68 @@ def fund_wallet():
         amount = data.get('amount', 1000)  # Default 1000 coins
         
         # Validate wallet address
-        if not wallet_address:
+        if not wallet_address or not isinstance(amount, (int, float)) or amount <= 0:
             return jsonify({
                 'success': False,
-                'error': 'Wallet address is required'
+                'error': 'Invalid wallet address or amount'
             }), 400
+
         
-        # Check if wallet exists
-        balance = wallet_manager.get_wallet_balance(wallet_address)
-        if balance is None:
-            return jsonify({
-                'success': False,
-                'error': 'Wallet not found'
-            }), 404
-        
-        # Update wallet balance
-        new_balance = balance + amount
-        success = wallet_manager.update_wallet_balance(wallet_address, new_balance)
-        
+        # Fund wallet using WalletManager logic
+        success = wallet_manager.fund_wallet(wallet_address, amount)
         if success:
+            new_balance = wallet_manager.get_wallet_balance(wallet_address)
             return jsonify({
                 'success': True,
-                'message': f'Funded {amount} coins to wallet {wallet_address}',
+                'message': f'✅ Funded {amount} coins to wallet {wallet_address}',
                 'new_balance': new_balance
-            })
+            }), 200
+
         else:
             return jsonify({
                 'success': False,
-                'error': 'Failed to fund wallet'
-            }), 400
-            
+                'error': 'Wallet not found or funding failed'
+            }), 404
     except Exception as e:
         logging.error(f"Error funding wallet: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
-
+        
 # Transaction Routes
 @app.route('/api/transaction/create', methods=['POST'])
 def create_transaction():
-    """Create new transaction"""
+    """Create new transaction using password"""
     try:
         data = request.get_json()
         sender = data.get('sender')
         recipient = data.get('recipient')
         amount = data.get('amount')
-        private_key = data.get('private_key')
-        
+        password = data.get('password')
+
+        if not sender or not recipient or not amount or not password:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+        # Just call transaction manager as in CLI
         transaction, error = transaction_manager.create_transaction(
-            sender, recipient, amount, private_key.encode()
+            sender, recipient, amount, password
         )
-        
+
         if transaction:
-            # Add to mempool
             success, msg = transaction_manager.add_to_mempool(transaction)
             if success:
-                # Broadcast transaction
                 network_manager.broadcast_message({
                     'type': 'new_transaction',
                     'transaction': transaction
                 })
-                
-                return jsonify({
-                    'success': True,
-                    'transaction': transaction
-                })
+                return jsonify({'success': True, 'transaction': transaction})
             else:
-                return jsonify({
-                    'success': False,
-                    'error': msg
-                }), 400
+                return jsonify({'success': False, 'error': msg}), 400
         else:
-            return jsonify({
-                'success': False,
-                'error': error
-            }), 400
+            return jsonify({'success': False, 'error': error}), 400
+
     except Exception as e:
         logging.error(f"Error creating transaction: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @app.route('/api/transaction/<tx_hash>')
 def get_transaction(tx_hash):

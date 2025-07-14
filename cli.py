@@ -11,7 +11,7 @@ import time
 import logging
 import argparse
 from datetime import datetime
-
+import traceback
 # Add the current directory to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -21,7 +21,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler("cli.log"),
-        logging.StreamHandler()
+        #logging.StreamHandler()
     ]
 )
 
@@ -105,7 +105,7 @@ def wallet_commands(args):
             print("❌ Failed to recover wallet")
     
     elif args.wallet_action == 'balance':
-        address = input("Enter wallet address: ")
+        address = input("Enter wallet address: ").strip()
         balance = wallet_manager.get_wallet_balance(address)
         if balance:
             print(f"\n💰 Wallet Balance for {address[:16]}...")
@@ -126,7 +126,7 @@ def wallet_commands(args):
             print("No wallets found")
     
     elif args.wallet_action == 'stake':
-        address = input("Enter wallet address: ")
+        address = input("Enter wallet address: ").strip()
         amount = float(input("Enter amount to stake: "))
         
         success = wallet_manager.stake_coins(address, amount)
@@ -136,7 +136,7 @@ def wallet_commands(args):
             print("❌ Failed to stake coins")
     
     elif args.wallet_action == 'unstake':
-        address = input("Enter wallet address: ")
+        address = input("Enter wallet address: ").strip()
         amount = float(input("Enter amount to unstake: "))
         
         success = wallet_manager.unstake_coins(address, amount)
@@ -145,18 +145,31 @@ def wallet_commands(args):
         else:
             print("❌ Failed to unstake coins")
 
+    elif args.wallet_action == 'fund':
+        address = input("Enter wallet address to fund: ")
+        amount = float(input("Enter amount to fund: "))
+        
+        success = wallet_manager.fund_wallet(address, amount)
+        if success:
+            print(f"✓ Successfully funded {amount:.8f} COIN to {address[:16]}...")
+        else:
+            print("❌ Failed to fund wallet")   
+    else:
+        print("❌ Invalid wallet action specified")
+
+
 def transaction_commands(args):
     """Handle transaction-related commands"""
     if args.transaction_action == 'send':
-        sender = input("Enter sender address: ")
-        recipient = input("Enter recipient address: ")
+        sender = input("Enter sender address: ").strip()
+        recipient = input("Enter recipient address: ").strip()
         amount = float(input("Enter amount: "))
-        private_key = input("Enter private key: ")
-        
+        password = input("Enter wallet password: ")
+
         transaction, error = transaction_manager.create_transaction(
-            sender, recipient, amount, private_key.encode()
+            sender, recipient, amount, password
         )
-        
+
         if transaction:
             success, msg = transaction_manager.add_to_mempool(transaction)
             if success:
@@ -164,8 +177,8 @@ def transaction_commands(args):
                 print(f"Transaction Hash: {transaction['tx_hash']}")
                 print(f"Amount: {amount:.8f} COIN")
                 print(f"Fee: {transaction['fee']:.8f} COIN")
-                
-                # Broadcast transaction
+
+                # Broadcast transaction to the network
                 network_manager.broadcast_message({
                     'type': 'new_transaction',
                     'transaction': transaction
@@ -176,9 +189,9 @@ def transaction_commands(args):
             print(f"❌ Failed to create transaction: {error}")
     
     elif args.transaction_action == 'history':
-        address = input("Enter wallet address: ")
+        address = input("Enter wallet address: ").strip()
         transactions = wallet_manager.get_wallet_transactions(address)
-        
+
         if transactions:
             print(f"\n📋 Transaction History for {address[:16]}...")
             print("-" * 100)
@@ -189,11 +202,11 @@ def transaction_commands(args):
                 print(f"    {'From' if tx_type == 'Received' else 'To'}: {tx['sender' if tx_type == 'Received' else 'recipient'][:16]}...")
         else:
             print("No transactions found")
-    
+
     elif args.transaction_action == 'status':
         tx_hash = input("Enter transaction hash: ")
         transaction = transaction_manager.get_transaction_by_hash(tx_hash)
-        
+
         if transaction:
             print(f"\n📄 Transaction Details:")
             print(f"Hash: {transaction['tx_hash']}")
@@ -205,6 +218,7 @@ def transaction_commands(args):
             print(f"Type: {'Coinbase' if transaction['is_coinbase'] else 'Regular'}")
         else:
             print("❌ Transaction not found")
+
 
 def mining_commands(args):
     """Handle mining-related commands"""
@@ -426,10 +440,11 @@ def main():
                     print("4. List Wallets")
                     print("5. Stake Coins")
                     print("6. Unstake Coins")
+                    print("7. fund wallet ")
                     
-                    wallet_choice = input("Enter choice (1-6): ").strip()
-                    actions = ['create', 'recover', 'balance', 'list', 'stake', 'unstake']
-                    if wallet_choice in ['1', '2', '3', '4', '5', '6']:
+                    wallet_choice = input("Enter choice (1-7: ").strip()
+                    actions = ['create', 'recover', 'balance', 'list', 'stake', 'unstake', 'fund']
+                    if wallet_choice in ['1', '2', '3', '4', '5', '6', '7']:
                         args = argparse.Namespace(wallet_action=actions[int(wallet_choice)-1])
                         wallet_commands(args)
                 

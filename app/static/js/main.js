@@ -354,9 +354,9 @@ function handleTransactionSubmit(event) {
     const sender = document.getElementById('tx-sender').value;
     const recipient = document.getElementById('tx-recipient').value;
     const amount = parseFloat(document.getElementById('tx-amount').value);
-    const privateKey = document.getElementById('tx-private-key').value;
+    const password = document.getElementById('tx-wallet-password').value;
     
-    if (!sender || !recipient || !amount || !privateKey) {
+    if (!sender || !recipient || !amount || !password) {
         showNotification('Please fill in all fields', 'warning');
         return;
     }
@@ -376,7 +376,7 @@ function handleTransactionSubmit(event) {
             sender: sender,
             recipient: recipient,
             amount: amount,
-            private_key: privateKey
+            password: password
         })
     })
     .then(response => response.json())

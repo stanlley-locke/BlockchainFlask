@@ -23,7 +23,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QStatusBar>
-#include <QTextBrowser>
+#include <QTextBrowser> 
 #include <iostream>
 #include <fstream>
 #include <sstream>

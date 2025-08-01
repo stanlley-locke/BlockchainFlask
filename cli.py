@@ -345,13 +345,11 @@ def run_web_interface():
     app, socketio = create_app()
     
     print("✓ Web interface started successfully!")
-    print("🌐 Access the dashboard at: http://localhost:5000")
-    print("🔧 Access the admin panel at: http://localhost:5000/admin")
     print("Press Ctrl+C to stop the server...")
     
     try:
         # Run the Flask app with Socket.IO
-        socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+        socketio.run(app, host='0.0.0.0', port=5001, debug=True, allow_unsafe_werkzeug=True)
     except KeyboardInterrupt:
         print("\n🛑 Shutting down web interface...")
         network_manager.stop_all_services()

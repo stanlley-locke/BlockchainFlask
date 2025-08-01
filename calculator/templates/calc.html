@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Calculator & Game Suite</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --accent: #9b59b6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--light);
+            padding: 12px 24px;
+            margin: 0 5px 10px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .content {
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            min-height: 500px;
+            margin-bottom: 30px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .calc-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .calc-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .calc-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .calc-card h3 i {
+            margin-right: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            min-height: 60px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+        
+        .tic-tac-toe {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px 0;
+        }
+        
+        .cell {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .cell.x {
+            color: var(--primary);
+        }
+        
+        .cell.o {
+            color: var(--secondary);
+        }
+        
+        .guess-game {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .guess-input {
+            display: flex;
+            margin: 20px 0;
+        }
+        
+        .guess-input input {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .guess-input button {
+            width: auto;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-top: 0;
+        }
+        
+        .guess-history {
+            margin-top: 20px;
+        }
+        
+        .history-item {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .high {
+            background: rgba(231, 76, 60, 0.3);
+        }
+        
+        .low {
+            background: rgba(52, 152, 219, 0.3);
+        }
+        
+        .win {
+            background: rgba(46, 204, 113, 0.3);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tic-tac-toe {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Super Calculator & Game Suite</h1>
+            <p class="subtitle">A comprehensive tool for calculations, conversions, and entertainment</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="basic">Basic Calculator</button>
+            <button class="tab-btn" data-tab="scientific">Scientific</button>
+            <button class="tab-btn" data-tab="stats">Statistics</button>
+            <button class="tab-btn" data-tab="conversion">Unit Conversion</button>
+            <button class="tab-btn" data-tab="games">Games</button>
+        </div>
+        
+        <div class="content">
+            <!-- Basic Calculator Tab -->
+            <div id="basic" class="tab-content active">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <h3>Basic Operations</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="basic-operation">
+                                <option value="add">Addition (+)</option>
+                                <option value="subtract">Subtraction (-)</option>
+                                <option value="multiply">Multiplication (×)</option>
+                                <option value="divide">Division (÷)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>First Number</label>
+                            <input type="number" id="basic-num1" placeholder="Enter number">
+                        </div>
+                        <div class="input-group">
+                            <label>Second Number</label>
+                            <input type="number" id="basic-num2" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateBasic()">Calculate</button>
+                        <div class="result" id="basic-result">Result will appear here</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <h3>Advanced Operations</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="advanced-operation">
+                                <option value="power">Power (xʸ)</option>
+                                <option value="modulus">Modulus (%)</option>
+                                <option value="absolute">Absolute Value</option>
+                                <option value="round">Round</option>
+                                <option value="ceil">Ceiling</option>
+                                <option value="floor">Floor</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>First Number</label>
+                            <input type="number" id="advanced-num1" placeholder="Enter number">
+                        </div>
+                        <div class="input-group" id="advanced-num2-group">
+                            <label>Second Number (for Power/Modulus)</label>
+                            <input type="number" id="advanced-num2" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateAdvanced()">Calculate</button>
+                        <div class="result" id="advanced-result">Result will appear here</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <h3>Utilities</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="util-operation">
+                                <option value="table">Multiplication Table</option>
+                                <option value="fibonacci">Fibonacci Sequence</option>
+                                <option value="prime">Prime Numbers</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Number</label>
+                            <input type="number" id="util-num" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateUtil()">Calculate</button>
+                        <div class="result" id="util-result">Result will appear here</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scientific Calculator Tab -->
+            <div id="scientific" class="tab-content">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <h3>Trigonometric Functions</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="trig-operation">
+                                <option value="sin">Sine (sin)</option>
+                                <option value="cos">Cosine (cos)</option>
+                                <option value="tan">Tangent (tan)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Angle in Degrees</label>
+                            <input type="number" id="trig-angle" placeholder="Enter angle">
+                        </div>
+                        <button onclick="calculateTrig()">Calculate</button>
+                        <div class="result" id="trig-result">Result will appear here</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <h3>Logarithmic & Roots</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="log-operation">
+                                <option value="log">Logarithm (log)</option>
+                                <option value="sqrt">Square Root (√)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Number</label>
+                            <input type="number" id="log-num" placeholder="Enter number">
+                        </div>
+                        <div class="input-group" id="log-base-group">
+                            <label>Base (for Logarithm)</label>
+                            <input type="number" id="log-base" placeholder="Enter base (default 10)">
+                        </div>
+                        <button onclick="calculateLog()">Calculate</button>
+                        <div class="result" id="log-result">Result will appear here</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <h3>Other Functions</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="other-operation">
+                                <option value="factorial">Factorial (!)</option>
+                                <option value="gcd">Greatest Common Divisor (GCD)</option>
+                                <option value="lcm">Least Common Multiple (LCM)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>First Number</label>
+                            <input type="number" id="other-num1" placeholder="Enter number">
+                        </div>
+                        <div class="input-group" id="other-num2-group">
+                            <label>Second Number (for GCD/LCM)</label>
+                            <input type="number" id="other-num2" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateOther()">Calculate</button>
+                        <div class="result" id="other-result">Result will appear here</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Tab -->
+            <div id="stats" class="tab-content">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <h3>Statistical Operations</h3>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="stats-operation">
+                                <option value="mean">Mean (Average)</option>
+                                <option value="median">Median</option>
+                                <option value="mode">Mode</option>
+                                <option value="variance">Variance</option>
+                                <option value="stddev">Standard Deviation</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Enter numbers (comma separated)</label>
+                            <input type="text" id="stats-numbers" placeholder="e.g. 5, 10, 15, 20">
+                        </div>
+                        <button onclick="calculateStats()">Calculate</button>
+                        <div class="result" id="stats-result">Result will appear here</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <h3>Constants</h3>
+                        <div class="input-group">
+                            <label>Constant</label>
+                            <select id="constant-select">
+                                <option value="pi">Pi (π)</option>
+                                <option value="e">Euler's Number (e)</option>
+                            </select>
+                        </div>
+                        <button onclick="showConstant()">Show Value</button>
+                        <div class="result" id="constant-result">Result will appear here</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Unit Conversion Tab -->
+            <div id="conversion" class="tab-content">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <h3>Unit Conversion</h3>
+                        <div class="input-group">
+                            <label>Category</label>
+                            <select id="conversion-category">
+                                <option value="length">Length</option>
+                                <option value="weight">Weight</option>
+                                <option value="temperature">Temperature</option>
+                                <option value="volume">Volume</option>
+                                <option value="speed">Speed</option>
+                                <option value="area">Area</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Value</label>
+                            <input type="number" id="conversion-value" placeholder="Enter value">
+                        </div>
+                        <div class="input-group">
+                            <label>From Unit</label>
+                            <select id="conversion-from"></select>
+                        </div>
+                        <div class="input-group">
+                            <label>To Unit</label>
+                            <select id="conversion-to"></select>
+                        </div>
+                        <button onclick="convertUnits()">Convert</button>
+                        <div class="result" id="conversion-result">Result will appear here</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <h3>Conversion Reference</h3>
+                        <div id="conversion-reference">
+                            <p>Select a category to see available units</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Games Tab -->
+            <div id="games" class="tab-content">
+                <div class="game-area">
+                    <div class="tabs" style="margin-bottom: 20px;">
+                        <button class="tab-btn active" data-game="tic_tac_toe">Tic Tac Toe</button>
+                        <button class="tab-btn" data-game="guess_number">Guess the Number</button>
+                    </div>
+                    
+                    <div id="tic-tac-toe-game" class="game-content active">
+                        <h2>Tic Tac Toe</h2>
+                        <div class="tic-tac-toe" id="tic-tac-toe-board">
+                            <div class="cell" data-index="0"></div>
+                            <div class="cell" data-index="1"></div>
+                            <div class="cell" data-index="2"></div>
+                            <div class="cell" data-index="3"></div>
+                            <div class="cell" data-index="4"></div>
+                            <div class="cell" data-index="5"></div>
+                            <div class="cell" data-index="6"></div>
+                            <div class="cell" data-index="7"></div>
+                            <div class="cell" data-index="8"></div>
+                        </div>
+                        <div id="game-status">Player X's turn</div>
+                        <button onclick="resetTicTacToe()">Reset Game</button>
+                    </div>
+                    
+                    <div id="guess-number-game" class="game-content">
+                        <h2>Guess the Number</h2>
+                        <div class="guess-game">
+                            <p>I'm thinking of a number between 1 and 100. Can you guess it?</p>
+                            <div class="guess-input">
+                                <input type="number" id="guess-input" placeholder="Enter your guess" min="1" max="100">
+                                <button onclick="makeGuess()">Guess</button>
+                            </div>
+                            <div id="guess-feedback">You have 10 attempts</div>
+                            <div class="guess-history" id="guess-history"></div>
+                            <button onclick="startNewGame()" style="margin-top: 20px;">New Game</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Super Calculator & Game Suite © 2023 | All calculations done server-side</p>
+        </div>
+    </div>
+
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Update tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show content
+                const tab = button.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(tab).classList.add('active');
+            });
+        });
+        
+        // Game tab navigation
+        document.querySelectorAll('[data-game]').forEach(button => {
+            button.addEventListener('click', () => {
+                // Update game tabs
+                document.querySelectorAll('[data-game]').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show game content
+                const game = button.getAttribute('data-game');
+                document.querySelectorAll('.game-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(`${game}-game`).classList.add('active');
+                
+                // Initialize game if needed
+                if (game === 'guess_number') {
+                    startNewGame();
+                }
+            });
+        });
+        
+        // Unit conversion setup
+        const units = {
+            length: ['meters', 'kilometers', 'centimeters', 'millimeters', 'inches', 'feet', 'yards'],
+            weight: ['grams', 'kilograms', 'milligrams', 'pounds', 'ounces'],
+            temperature: ['celsius', 'fahrenheit', 'kelvin'],
+            volume: ['liters', 'milliliters', 'gallons', 'quarts', 'pints', 'cups'],
+            speed: ['mps', 'kph', 'mph', 'knots'],
+            area: ['sq_meters', 'sq_kilometers', 'sq_centimeters', 'sq_millimeters', 'sq_inches', 'sq_feet', 'sq_yards']
+        };
+        
+        const unitNames = {
+            mps: 'm/s',
+            kph: 'km/h',
+            mph: 'mph',
+            knots: 'knots',
+            sq_meters: 'm²',
+            sq_kilometers: 'km²',
+            sq_centimeters: 'cm²',
+            sq_millimeters: 'mm²',
+            sq_inches: 'in²',
+            sq_feet: 'ft²',
+            sq_yards: 'yd²'
+        };
+        
+        // Populate unit dropdowns
+        document.getElementById('conversion-category').addEventListener('change', function() {
+            const category = this.value;
+            const fromSelect = document.getElementById('conversion-from');
+            const toSelect = document.getElementById('conversion-to');
+            
+            // Clear selects
+            fromSelect.innerHTML = '';
+            toSelect.innerHTML = '';
+            
+            // Add options
+            units[category].forEach(unit => {
+                const displayName = unitNames[unit] || unit;
+                const option1 = document.createElement('option');
+                option1.value = unit;
+                option1.textContent = displayName;
+                fromSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = unit;
+                option2.textContent = displayName;
+                toSelect.appendChild(option2);
+            });
+            
+            // Set default "to" unit to the second option
+            if (units[category].length > 1) {
+                toSelect.selectedIndex = 1;
+            }
+            
+            // Update reference
+            updateConversionReference(category);
+        });
+        
+        // Initialize conversion category
+        document.getElementById('conversion-category').dispatchEvent(new Event('change'));
+        
+        function updateConversionReference(category) {
+            const referenceDiv = document.getElementById('conversion-reference');
+            let html = `<h3>${category.charAt(0).toUpperCase() + category.slice(1)} Units</h3><ul>`;
+            
+            units[category].forEach(unit => {
+                const displayName = unitNames[unit] || unit;
+                html += `<li><strong>${displayName}</strong> (${unit})</li>`;
+            });
+            
+            html += '</ul>';
+            referenceDiv.innerHTML = html;
+        }
+        
+        // API call function
+        async function callAPI(endpoint, data) {
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                return { error: 'Failed to connect to server' };
+            }
+        }
+        
+        // Basic calculator
+        async function calculateBasic() {
+            const operation = document.getElementById('basic-operation').value;
+            const num1 = parseFloat(document.getElementById('basic-num1').value);
+            const num2 = parseFloat(document.getElementById('basic-num2').value);
+            
+            if (isNaN(num1) || isNaN(num2)) {
+                document.getElementById('basic-result').textContent = 'Please enter valid numbers';
+                return;
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: [num1, num2]
+            });
+            
+            document.getElementById('basic-result').textContent = `Result: ${result.result}`;
+        }
+        
+        // Advanced calculator
+        async function calculateAdvanced() {
+            const operation = document.getElementById('advanced-operation').value;
+            const num1 = parseFloat(document.getElementById('advanced-num1').value);
+            let num2 = parseFloat(document.getElementById('advanced-num2').value);
+            
+            if (isNaN(num1)) {
+                document.getElementById('advanced-result').textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            let params = [num1];
+            if (operation === 'power' || operation === 'modulus') {
+                if (isNaN(num2)) {
+                    document.getElementById('advanced-result').textContent = 'Please enter a second number';
+                    return;
+                }
+                params.push(num2);
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: params
+            });
+            
+            document.getElementById('advanced-result').textContent = `Result: ${result.result}`;
+        }
+        
+        // Utilities
+        async function calculateUtil() {
+            const operation = document.getElementById('util-operation').value;
+            const num = parseFloat(document.getElementById('util-num').value);
+            
+            if (isNaN(num)) {
+                document.getElementById('util-result').textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: [num]
+            });
+            
+            if (Array.isArray(result.result)) {
+                document.getElementById('util-result').textContent = result.result.join(', ');
+            } else {
+                document.getElementById('util-result').textContent = result.result;
+            }
+        }
+        
+        // Trigonometric functions
+        async function calculateTrig() {
+            const operation = document.getElementById('trig-operation').value;
+            const angle = parseFloat(document.getElementById('trig-angle').value);
+            
+            if (isNaN(angle)) {
+                document.getElementById('trig-result').textContent = 'Please enter a valid angle';
+                return;
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: [angle]
+            });
+            
+            document.getElementById('trig-result').textContent = `Result: ${result.result.toFixed(4)}`;
+        }
+        
+        // Logarithmic functions
+        async function calculateLog() {
+            const operation = document.getElementById('log-operation').value;
+            const num = parseFloat(document.getElementById('log-num').value);
+            
+            if (isNaN(num)) {
+                document.getElementById('log-result').textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            let params = [num];
+            if (operation === 'log') {
+                const base = parseFloat(document.getElementById('log-base').value);
+                if (!isNaN(base)) {
+                    params.push(base);
+                }
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: params
+            });
+            
+            document.getElementById('log-result').textContent = `Result: ${result.result}`;
+        }
+        
+        // Other scientific functions
+        async function calculateOther() {
+            const operation = document.getElementById('other-operation').value;
+            const num1 = parseFloat(document.getElementById('other-num1').value);
+            let num2 = parseFloat(document.getElementById('other-num2').value);
+            
+            if (isNaN(num1)) {
+                document.getElementById('other-result').textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            let params = [num1];
+            if (operation === 'gcd' || operation === 'lcm') {
+                if (isNaN(num2)) {
+                    document.getElementById('other-result').textContent = 'Please enter a second number';
+                    return;
+                }
+                params.push(num2);
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: params
+            });
+            
+            document.getElementById('other-result').textContent = `Result: ${result.result}`;
+        }
+        
+        // Statistics
+        async function calculateStats() {
+            const operation = document.getElementById('stats-operation').value;
+            const numbersInput = document.getElementById('stats-numbers').value;
+            
+            if (!numbersInput) {
+                document.getElementById('stats-result').textContent = 'Please enter numbers';
+                return;
+            }
+            
+            const numbers = numbersInput.split(',').map(num => parseFloat(num.trim())).filter(num => !isNaN(num));
+            
+            if (numbers.length === 0) {
+                document.getElementById('stats-result').textContent = 'Please enter valid numbers';
+                return;
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: operation,
+                params: numbers
+            });
+            
+            document.getElementById('stats-result').textContent = `Result: ${result.result}`;
+        }
+        
+        // Constants
+        async function showConstant() {
+            const constant = document.getElementById('constant-select').value;
+            
+            const result = await callAPI('/api/calculate', {
+                operation: constant
+            });
+            
+            document.getElementById('constant-result').textContent = `Result: ${result.result}`;
+        }
+        
+        // Unit conversion
+        async function convertUnits() {
+            const category = document.getElementById('conversion-category').value;
+            const value = parseFloat(document.getElementById('conversion-value').value);
+            const fromUnit = document.getElementById('conversion-from').value;
+            const toUnit = document.getElementById('conversion-to').value;
+            
+            if (isNaN(value)) {
+                document.getElementById('conversion-result').textContent = 'Please enter a valid value';
+                return;
+            }
+            
+            const result = await callAPI('/api/calculate', {
+                operation: 'convert',
+                category: category,
+                from_unit: fromUnit,
+                to_unit: toUnit,
+                params: [value]
+            });
+            
+            if (typeof result.result === 'number') {
+                document.getElementById('conversion-result').textContent = 
+                    `${value} ${fromUnit} = ${result.result.toFixed(6)} ${toUnit}`;
+            } else {
+                document.getElementById('conversion-result').textContent = result.result;
+            }
+        }
+        
+        // Tic Tac Toe Game
+        let board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+        let currentPlayer = 'X';
+        let gameOver = false;
+        
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', () => {
+                const index = parseInt(cell.getAttribute('data-index'));
+                if (!gameOver && board[index] === ' ') {
+                    playMove(index);
+                }
+            });
+        });
+        
+        async function playMove(position) {
+            const result = await callAPI('/api/game', {
+                game: 'tic_tac_toe',
+                board: board,
+                player: currentPlayer,
+                position: position
+            });
+            
+            board = result.board;
+            currentPlayer = result.next_player;
+            gameOver = result.winner !== undefined;
+            
+            updateBoard();
+            
+            if (result.winner) {
+                const statusDiv = document.getElementById('game-status');
+                if (result.winner === 'T') {
+                    statusDiv.textContent = "It's a tie!";
+                } else {
+                    statusDiv.textContent = `Player ${result.winner} wins!`;
+                }
+            } else {
+                document.getElementById('game-status').textContent = `Player ${currentPlayer}'s turn`;
+            }
+        }
+        
+        function updateBoard() {
+            document.querySelectorAll('.cell').forEach((cell, index) => {
+                cell.textContent = board[index];
+                if (board[index] === 'X') {
+                    cell.className = 'cell x';
+                } else if (board[index] === 'O') {
+                    cell.className = 'cell o';
+                } else {
+                    cell.className = 'cell';
+                }
+            });
+        }
+        
+        function resetTicTacToe() {
+            board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+            currentPlayer = 'X';
+            gameOver = false;
+            updateBoard();
+            document.getElementById('game-status').textContent = "Player X's turn";
+        }
+        
+        // Guess the Number Game
+        let secretNumber = null;
+        let attempts = 0;
+        const maxAttempts = 10;
+        const guessHistory = [];
+        
+        function startNewGame() {
+            callAPI('/api/game', {
+                game: 'guess_number'
+            }).then(result => {
+                secretNumber = result.secret;
+                attempts = 0;
+                guessHistory.length = 0;
+                document.getElementById('guess-feedback').textContent = `I'm thinking of a number between 1 and 100. You have ${maxAttempts} attempts.`;
+                document.getElementById('guess-history').innerHTML = '';
+                document.getElementById('guess-input').value = '';
+            });
+        }
+        
+        async function makeGuess() {
+            if (!secretNumber) {
+                startNewGame();
+                return;
+            }
+            
+            const guessInput = document.getElementById('guess-input');
+            const guess = parseInt(guessInput.value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById('guess-feedback').textContent = 'Please enter a number between 1 and 100';
+                return;
+            }
+            
+            attempts++;
+            const result = await callAPI('/api/game', {
+                game: 'guess_number',
+                secret: secretNumber,
+                guess: guess,
+                attempts: attempts - 1  // Because we increment before sending
+            });
+            
+            let feedback = '';
+            let historyClass = '';
+            
+            if (result.status === 'low') {
+                feedback = `Too low! Attempts: ${attempts}/${maxAttempts}`;
+                historyClass = 'low';
+            } else if (result.status === 'high') {
+                feedback = `Too high! Attempts: ${attempts}/${maxAttempts}`;
+                historyClass = 'high';
+            } else if (result.status === 'win') {
+                feedback = `Congratulations! You guessed it in ${attempts} attempts!`;
+                historyClass = 'win';
+            }
+            
+            document.getElementById('guess-feedback').textContent = feedback;
+            
+            // Add to history
+            const historyItem = document.createElement('div');
+            historyItem.className = `history-item ${historyClass}`;
+            historyItem.textContent = guess;
+            document.getElementById('guess-history').appendChild(historyItem);
+            
+            // Clear input
+            guessInput.value = '';
+            
+            // Check if game is over
+            if (result.status === 'win' || attempts >= maxAttempts) {
+                if (result.status !== 'win') {
+                    document.getElementById('guess-feedback').textContent = 
+                        `Game over! The number was ${secretNumber}. Attempts: ${attempts}/${maxAttempts}`;
+                }
+                secretNumber = null;
+            }
+        }
+        
+        // Initialize
+        resetTicTacToe();
+        startNewGame();
+    </script>
+</body>
+</html>

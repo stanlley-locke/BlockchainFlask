@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCalc | Modern Calculator Suite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #f39c12;
+            --dark: #1a2a3a;
+            --darker: #121e2a;
+            --light: #ecf0f1;
+            --card-bg: rgba(26, 42, 58, 0.8);
+            --card-hover: rgba(33, 53, 73, 0.9);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0 30px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.85;
+            max-width: 700px;
+            margin: 10px auto 0;
+            font-weight: 300;
+            color: #a0b8cc;
+        }
+        
+        .tabs-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .tabs-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        
+        .tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 8px;
+            padding: 0 20px;
+        }
+        
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--light);
+            padding: 14px 28px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent), #e67e22);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+            color: white;
+        }
+        
+        .tab-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(12px);
+            min-height: 600px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        .calc-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calc-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-hover);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        
+        .card-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+        }
+        
+        .calc-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--light);
+            margin: 0;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #a0b8cc;
+            font-size: 0.95rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--light);
+            font-size: 1.05rem;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.2s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--accent), #e67e22);
+            color: white;
+            border: none;
+            padding: 16px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            min-height: 80px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            color: var(--secondary);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+        
+        .tic-tac-toe {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 8px;
+            margin: 25px 0;
+        }
+        
+        .cell {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: scale(1.03);
+        }
+        
+        .cell.x {
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+        }
+        
+        .cell.o {
+            color: var(--secondary);
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+        }
+        
+        .guess-game {
+            text-align: center;
+            max-width: 550px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .guess-input {
+            display: flex;
+            margin: 25px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .guess-input input {
+            flex: 1;
+            border-radius: 0;
+            border: none;
+            padding: 18px;
+        }
+        
+        .guess-input button {
+            width: auto;
+            border-radius: 0;
+            margin: 0;
+            padding: 18px 30px;
+            border: none;
+        }
+        
+        .guess-history {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .history-item {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.08);
+            font-weight: 500;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .high {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .low {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+        
+        .win {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--secondary);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(46, 204, 113, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 25px;
+            font-size: 1rem;
+            color: #7a9bb8;
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1100px) {
+            .tabs {
+                justify-content: flex-start;
+                padding: 0 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .tic-tac-toe {
+                grid-template-columns: repeat(3, 90px);
+                grid-template-rows: repeat(3, 90px);
+            }
+            
+            .card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .calc-card h3 {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .tic-tac-toe {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+            }
+            
+            .result {
+                font-size: 1.1rem;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h1>NeoCalc</h1>
+            </div>
+            <p class="subtitle">A modern calculator suite with advanced functions, unit conversions, and fun games</p>
+        </header>
+        
+        <div class="tabs-container">
+            <div class="tabs-scroll">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="basic">
+                        <i class="fas fa-calculator"></i> Basic
+                    </button>
+                    <button class="tab-btn" data-tab="scientific">
+                        <i class="fas fa-atom"></i> Scientific
+                    </button>
+                    <button class="tab-btn" data-tab="stats">
+                        <i class="fas fa-chart-bar"></i> Statistics
+                    </button>
+                    <button class="tab-btn" data-tab="conversion">
+                        <i class="fas fa-exchange-alt"></i> Conversion
+                    </button>
+                    <button class="tab-btn" data-tab="games">
+                        <i class="fas fa-gamepad"></i> Games
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Basic Calculator Tab -->
+            <div id="basic" class="tab-content active">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <h3>Basic Operations</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="basic-operation">
+                                <option value="add">Addition (+)</option>
+                                <option value="subtract">Subtraction (-)</option>
+                                <option value="multiply">Multiplication (×)</option>
+                                <option value="divide">Division (÷)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>First Number</label>
+                            <input type="number" id="basic-num1" placeholder="Enter number">
+                        </div>
+                        <div class="input-group">
+                            <label>Second Number</label>
+                            <input type="number" id="basic-num2" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateBasic()">Calculate</button>
+                        <div class="result" id="basic-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3>Advanced Operations</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="advanced-operation">
+                                <option value="power">Power (xʸ)</option>
+                                <option value="modulus">Modulus (%)</option>
+                                <option value="absolute">Absolute Value</option>
+                                <option value="round">Round</option>
+                                <option value="ceil">Ceiling</option>
+                                <option value="floor">Floor</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>First Number</label>
+                            <input type="number" id="advanced-num1" placeholder="Enter number">
+                        </div>
+                        <div class="input-group" id="advanced-num2-group">
+                            <label>Second Number (for Power/Modulus)</label>
+                            <input type="number" id="advanced-num2" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateAdvanced()">Calculate</button>
+                        <div class="result" id="advanced-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h3>Utilities</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="util-operation">
+                                <option value="table">Multiplication Table</option>
+                                <option value="fibonacci">Fibonacci Sequence</option>
+                                <option value="prime">Prime Numbers</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Number</label>
+                            <input type="number" id="util-num" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateUtil()">Calculate</button>
+                        <div class="result" id="util-result">Result will appear here</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scientific Calculator Tab -->
+            <div id="scientific" class="tab-content">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-sine-wave"></i>
+                            </div>
+                            <h3>Trigonometric Functions</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="trig-operation">
+                                <option value="sin">Sine (sin)</option>
+                                <option value="cos">Cosine (cos)</option>
+                                <option value="tan">Tangent (tan)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Angle in Degrees</label>
+                            <input type="number" id="trig-angle" placeholder="Enter angle">
+                        </div>
+                        <button onclick="calculateTrig()">Calculate</button>
+                        <div class="result" id="trig-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-superscript"></i>
+                            </div>
+                            <h3>Logarithmic & Roots</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="log-operation">
+                                <option value="log">Logarithm (log)</option>
+                                <option value="sqrt">Square Root (√)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Number</label>
+                            <input type="number" id="log-num" placeholder="Enter number">
+                        </div>
+                        <div class="input-group" id="log-base-group">
+                            <label>Base (for Logarithm)</label>
+                            <input type="number" id="log-base" placeholder="Enter base (default 10)">
+                        </div>
+                        <button onclick="calculateLog()">Calculate</button>
+                        <div class="result" id="log-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-function"></i>
+                            </div>
+                            <h3>Other Functions</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="other-operation">
+                                <option value="factorial">Factorial (!)</option>
+                                <option value="gcd">Greatest Common Divisor (GCD)</option>
+                                <option value="lcm">Least Common Multiple (LCM)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>First Number</label>
+                            <input type="number" id="other-num1" placeholder="Enter number">
+                        </div>
+                        <div class="input-group" id="other-num2-group">
+                            <label>Second Number (for GCD/LCM)</label>
+                            <input type="number" id="other-num2" placeholder="Enter number">
+                        </div>
+                        <button onclick="calculateOther()">Calculate</button>
+                        <div class="result" id="other-result">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Tab -->
+            <div id="stats" class="tab-content">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Statistical Operations</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Operation</label>
+                            <select id="stats-operation">
+                                <option value="mean">Mean (Average)</option>
+                                <option value="median">Median</option>
+                                <option value="mode">Mode</option>
+                                <option value="variance">Variance</option>
+                                <option value="stddev">Standard Deviation</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Enter numbers (comma separated)</label>
+                            <input type="text" id="stats-numbers" placeholder="e.g. 5, 10, 15, 20">
+                        </div>
+                        <button onclick="calculateStats()">Calculate</button>
+                        <div class="result" id="stats-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-infinity"></i>
+                            </div>
+                            <h3>Constants</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Constant</label>
+                            <select id="constant-select">
+                                <option value="pi">Pi (π)</option>
+                                <option value="e">Euler's Number (e)</option>
+                            </select>
+                        </div>
+                        <button onclick="showConstant()">Show Value</button>
+                        <div class="result" id="constant-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <h3>3D Function Plotter</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Function</label>
+                            <select>
+                                <option>Sine Wave</option>
+                                <option>Cosine Wave</option>
+                                <option>Paraboloid</option>
+                                <option>Hyperboloid</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Parameters</label>
+                            <input type="text" placeholder="Enter parameters">
+                        </div>
+                        <button>Plot Function</button>
+                        <div class="result">3D visualization will appear here</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Unit Conversion Tab -->
+            <div id="conversion" class="tab-content">
+                <div class="calculator-grid">
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-ruler-combined"></i>
+                            </div>
+                            <h3>Unit Conversion</h3>
+                        </div>
+                        <div class="input-group">
+                            <label>Category</label>
+                            <select id="conversion-category">
+                                <option value="length">Length</option>
+                                <option value="weight">Weight</option>
+                                <option value="temperature">Temperature</option>
+                                <option value="volume">Volume</option>
+                                <option value="speed">Speed</option>
+                                <option value="area">Area</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Value</label>
+                            <input type="number" id="conversion-value" placeholder="Enter value">
+                        </div>
+                        <div class="input-group">
+                            <label>From Unit</label>
+                            <select id="conversion-from"></select>
+                        </div>
+                        <div class="input-group">
+                            <label>To Unit</label>
+                            <select id="conversion-to"></select>
+                        </div>
+                        <button onclick="convertUnits()">Convert</button>
+                        <div class="result" id="conversion-result">0</div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3>Conversion Reference</h3>
+                        </div>
+                        <div id="conversion-reference">
+                            <p>Select a category to see available units</p>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h3>Recent Conversions</h3>
+                        </div>
+                        <div class="result" style="text-align: left; justify-content: flex-start;">
+                            <ul style="padding-left: 20px;">
+                                <li>10 km = 6.21371 miles</li>
+                                <li>32°F = 0°C</li>
+                                <li>5 liters = 1.32086 gallons</li>
+                                <li>100 mph = 160.934 kph</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Games Tab -->
+            <div id="games" class="tab-content">
+                <div class="game-area">
+                    <div class="tabs" style="margin-bottom: 20px;">
+                        <button class="tab-btn active" data-game="tic_tac_toe">
+                            <i class="fas fa-times"></i> Tic Tac Toe
+                        </button>
+                        <button class="tab-btn" data-game="guess_number">
+                            <i class="fas fa-question"></i> Guess the Number
+                        </button>
+                    </div>
+                    
+                    <div id="tic-tac-toe-game" class="game-content active">
+                        <h2>Tic Tac Toe</h2>
+                        <div class="tic-tac-toe" id="tic-tac-toe-board">
+                            <div class="cell" data-index="0"></div>
+                            <div class="cell" data-index="1"></div>
+                            <div class="cell" data-index="2"></div>
+                            <div class="cell" data-index="3"></div>
+                            <div class="cell" data-index="4"></div>
+                            <div class="cell" data-index="5"></div>
+                            <div class="cell" data-index="6"></div>
+                            <div class="cell" data-index="7"></div>
+                            <div class="cell" data-index="8"></div>
+                        </div>
+                        <div id="game-status">Player X's turn</div>
+                        <button onclick="resetTicTacToe()">Reset Game</button>
+                    </div>
+                    
+                    <div id="guess-number-game" class="game-content">
+                        <h2>Guess the Number</h2>
+                        <div class="guess-game">
+                            <p>I'm thinking of a number between 1 and 100. Can you guess it?</p>
+                            <div class="guess-input">
+                                <input type="number" id="guess-input" placeholder="Enter your guess" min="1" max="100">
+                                <button onclick="makeGuess()">Guess</button>
+                            </div>
+                            <div id="guess-feedback">You have 10 attempts</div>
+                            <div class="guess-history" id="guess-history"></div>
+                            <button onclick="startNewGame()" style="margin-top: 20px;">New Game</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 NeoCalc | Modern Calculator Suite | Designed with <i class="fas fa-heart" style="color: #e74c3c;"></i> for Math Enthusiasts</p>
+        </div>
+    </div>
+
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Update tabs
+                if (button.dataset.tab) {
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        if (btn.dataset.tab) btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+                    
+                    // Show content
+                    const tab = button.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(tab).classList.add('active');
+                }
+                
+                // Game tab navigation
+                if (button.dataset.game) {
+                    document.querySelectorAll('[data-game]').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show game content
+                    const game = button.getAttribute('data-game');
+                    document.querySelectorAll('.game-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${game}-game`).classList.add('active');
+                    
+                    // Initialize game if needed
+                    if (game === 'guess_number') {
+                        startNewGame();
+                    }
+                }
+            });
+        });
+        
+        // Unit conversion setup
+        const units = {
+            length: ['meters', 'kilometers', 'centimeters', 'millimeters', 'inches', 'feet', 'yards'],
+            weight: ['grams', 'kilograms', 'milligrams', 'pounds', 'ounces'],
+            temperature: ['celsius', 'fahrenheit', 'kelvin'],
+            volume: ['liters', 'milliliters', 'gallons', 'quarts', 'pints', 'cups'],
+            speed: ['mps', 'kph', 'mph', 'knots'],
+            area: ['sq_meters', 'sq_kilometers', 'sq_centimeters', 'sq_millimeters', 'sq_inches', 'sq_feet', 'sq_yards']
+        };
+        
+        const unitNames = {
+            mps: 'm/s',
+            kph: 'km/h',
+            mph: 'mph',
+            knots: 'knots',
+            sq_meters: 'm²',
+            sq_kilometers: 'km²',
+            sq_centimeters: 'cm²',
+            sq_millimeters: 'mm²',
+            sq_inches: 'in²',
+            sq_feet: 'ft²',
+            sq_yards: 'yd²'
+        };
+        
+        // Populate unit dropdowns
+        document.getElementById('conversion-category').addEventListener('change', function() {
+            const category = this.value;
+            const fromSelect = document.getElementById('conversion-from');
+            const toSelect = document.getElementById('conversion-to');
+            
+            // Clear selects
+            fromSelect.innerHTML = '';
+            toSelect.innerHTML = '';
+            
+            // Add options
+            units[category].forEach(unit => {
+                const displayName = unitNames[unit] || unit;
+                const option1 = document.createElement('option');
+                option1.value = unit;
+                option1.textContent = displayName;
+                fromSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = unit;
+                option2.textContent = displayName;
+                toSelect.appendChild(option2);
+            });
+            
+            // Set default "to" unit to the second option
+            if (units[category].length > 1) {
+                toSelect.selectedIndex = 1;
+            }
+            
+            // Update reference
+            updateConversionReference(category);
+        });
+        
+        // Initialize conversion category
+        document.getElementById('conversion-category').dispatchEvent(new Event('change'));
+        
+        function updateConversionReference(category) {
+            const referenceDiv = document.getElementById('conversion-reference');
+            let html = `<h3>${category.charAt(0).toUpperCase() + category.slice(1)} Units</h3><ul>`;
+            
+            units[category].forEach(unit => {
+                const displayName = unitNames[unit] || unit;
+                html += `<li><strong>${displayName}</strong> (${unit})</li>`;
+            });
+            
+            html += '</ul>';
+            referenceDiv.innerHTML = html;
+        }
+        
+        // Calculator functions (simplified for demo)
+        function calculateBasic() {
+            const operation = document.getElementById('basic-operation').value;
+            const num1 = parseFloat(document.getElementById('basic-num1').value) || 0;
+            const num2 = parseFloat(document.getElementById('basic-num2').value) || 0;
+            
+            let result;
+            switch(operation) {
+                case 'add': result = num1 + num2; break;
+                case 'subtract': result = num1 - num2; break;
+                case 'multiply': result = num1 * num2; break;
+                case 'divide': result = num2 !== 0 ? num1 / num2 : 'Error: Division by zero'; break;
+            }
+            
+            document.getElementById('basic-result').textContent = result;
+        }
+        
+        function calculateAdvanced() {
+            const operation = document.getElementById('advanced-operation').value;
+            const num1 = parseFloat(document.getElementById('advanced-num1').value) || 0;
+            const num2 = parseFloat(document.getElementById('advanced-num2').value) || 0;
+            
+            let result;
+            switch(operation) {
+                case 'power': result = Math.pow(num1, num2); break;
+                case 'modulus': result = num2 !== 0 ? num1 % num2 : 'Error: Modulus by zero'; break;
+                case 'absolute': result = Math.abs(num1); break;
+                case 'round': result = Math.round(num1); break;
+                case 'ceil': result = Math.ceil(num1); break;
+                case 'floor': result = Math.floor(num1); break;
+            }
+            
+            document.getElementById('advanced-result').textContent = result;
+        }
+        
+        function calculateUtil() {
+            const operation = document.getElementById('util-operation').value;
+            const num = parseInt(document.getElementById('util-num').value) || 5;
+            
+            let result;
+            switch(operation) {
+                case 'table': 
+                    result = [];
+                    for(let i = 1; i <= 10; i++) {
+                        result.push(`${num} × ${i} = ${num * i}`);
+                    }
+                    result = result.join(', ');
+                    break;
+                case 'fibonacci': 
+                    const fib = [0, 1];
+                    for(let i = 2; i < num; i++) {
+                        fib.push(fib[i-1] + fib[i-2]);
+                    }
+                    result = fib.slice(0, num).join(', ');
+                    break;
+                case 'prime': 
+                    const primes = [];
+                    for(let i = 2; i <= num; i++) {
+                        let isPrime = true;
+                        for(let j = 2; j <= Math.sqrt(i); j++) {
+                            if(i % j === 0) {
+                                isPrime = false;
+                                break;
+                            }
+                        }
+                        if(isPrime) primes.push(i);
+                    }
+                    result = primes.join(', ');
+                    break;
+            }
+            
+            document.getElementById('util-result').textContent = result;
+        }
+        
+        function calculateTrig() {
+            const operation = document.getElementById('trig-operation').value;
+            const angle = parseFloat(document.getElementById('trig-angle').value) || 0;
+            const rad = angle * Math.PI / 180;
+            
+            let result;
+            switch(operation) {
+                case 'sin': result = Math.sin(rad).toFixed(4); break;
+                case 'cos': result = Math.cos(rad).toFixed(4); break;
+                case 'tan': result = Math.tan(rad).toFixed(4); break;
+            }
+            
+            document.getElementById('trig-result').textContent = result;
+        }
+        
+        function calculateLog() {
+            const operation = document.getElementById('log-operation').value;
+            const num = parseFloat(document.getElementById('log-num').value) || 10;
+            const base = parseFloat(document.getElementById('log-base').value) || 10;
+            
+            let result;
+            switch(operation) {
+                case 'log': 
+                    result = Math.log(num) / Math.log(base);
+                    result = result.toFixed(4);
+                    break;
+                case 'sqrt': 
+                    result = Math.sqrt(num).toFixed(4);
+                    break;
+            }
+            
+            document.getElementById('log-result').textContent = result;
+        }
+        
+        function calculateOther() {
+            const operation = document.getElementById('other-operation').value;
+            const num1 = parseInt(document.getElementById('other-num1').value) || 12;
+            const num2 = parseInt(document.getElementById('other-num2').value) || 18;
+            
+            let result;
+            switch(operation) {
+                case 'factorial': 
+                    let fact = 1;
+                    for(let i = 2; i <= num1; i++) {
+                        fact *= i;
+                    }
+                    result = fact;
+                    break;
+                case 'gcd': 
+                    let a = num1, b = num2;
+                    while(b) {
+                        let t = b;
+                        b = a % b;
+                        a = t;
+                    }
+                    result = a;
+                    break;
+                case 'lcm': 
+                    const gcd = () => {
+                        let x = num1, y = num2;
+                        while(y) {
+                            let t = y;
+                            y = x % y;
+                            x = t;
+                        }
+                        return x;
+                    };
+                    result = (num1 * num2) / gcd();
+                    break;
+            }
+            
+            document.getElementById('other-result').textContent = result;
+        }
+        
+        function calculateStats() {
+            const operation = document.getElementById('stats-operation').value;
+            const numbersInput = document.getElementById('stats-numbers').value || "5,10,15,20";
+            const numbers = numbersInput.split(',').map(num => parseFloat(num.trim())).filter(num => !isNaN(num));
+            
+            if (numbers.length === 0) {
+                document.getElementById('stats-result').textContent = 'Please enter valid numbers';
+                return;
+            }
+            
+            let result;
+            switch(operation) {
+                case 'mean': 
+                    const sum = numbers.reduce((a, b) => a + b, 0);
+                    result = sum / numbers.length;
+                    break;
+                case 'median': 
+                    const sorted = [...numbers].sort((a, b) => a - b);
+                    const mid = Math.floor(sorted.length / 2);
+                    result = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+                    break;
+                case 'mode': 
+                    const counts = {};
+                    numbers.forEach(num => counts[num] = (counts[num] || 0) + 1);
+                    const maxCount = Math.max(...Object.values(counts));
+                    result = Object.keys(counts).filter(num => counts[num] === maxCount).join(', ');
+                    break;
+                case 'variance': 
+                    const mean = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+                    const variances = numbers.map(num => Math.pow(num - mean, 2));
+                    result = variances.reduce((a, b) => a + b, 0) / numbers.length;
+                    break;
+                case 'stddev': 
+                    const mean2 = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+                    const variances2 = numbers.map(num => Math.pow(num - mean2, 2));
+                    const variance2 = variances2.reduce((a, b) => a + b, 0) / numbers.length;
+                    result = Math.sqrt(variance2);
+                    break;
+            }
+            
+            document.getElementById('stats-result').textContent = result.toFixed(4);
+        }
+        
+        function showConstant() {
+            const constant = document.getElementById('constant-select').value;
+            let result;
+            switch(constant) {
+                case 'pi': result = Math.PI; break;
+                case 'e': result = Math.E; break;
+            }
+            document.getElementById('constant-result').textContent = result;
+        }
+        
+        function convertUnits() {
+            const category = document.getElementById('conversion-category').value;
+            const value = parseFloat(document.getElementById('conversion-value').value) || 1;
+            const fromUnit = document.getElementById('conversion-from').value;
+            const toUnit = document.getElementById('conversion-to').value;
+            
+            // Simple conversion factors for demo
+            const factors = {
+                length: {
+                    meters: 1,
+                    kilometers: 0.001,
+                    centimeters: 100,
+                    millimeters: 1000,
+                    inches: 39.3701,
+                    feet: 3.28084,
+                    yards: 1.09361
+                },
+                weight: {
+                    grams: 1,
+                    kilograms: 0.001,
+                    milligrams: 1000,
+                    pounds: 0.00220462,
+                    ounces: 0.035274
+                },
+                temperature: {
+                    celsius: 1,
+                    fahrenheit: 33.8,
+                    kelvin: 274.15
+                },
+                volume: {
+                    liters: 1,
+                    milliliters: 1000,
+                    gallons: 0.264172,
+                    quarts: 1.05669,
+                    pints: 2.11338,
+                    cups: 4.22675
+                },
+                speed: {
+                    mps: 1,
+                    kph: 3.6,
+                    mph: 2.23694,
+                    knots: 1.94384
+                },
+                area: {
+                    sq_meters: 1,
+                    sq_kilometers: 0.000001,
+                    sq_centimeters: 10000,
+                    sq_millimeters: 1000000,
+                    sq_inches: 1550,
+                    sq_feet: 10.7639,
+                    sq_yards: 1.19599
+                }
+            };
+            
+            if (factors[category] && factors[category][fromUnit] && factors[category][toUnit]) {
+                const result = value * factors[category][toUnit] / factors[category][fromUnit];
+                document.getElementById('conversion-result').textContent = result.toFixed(5);
+            } else {
+                document.getElementById('conversion-result').textContent = "Conversion error";
+            }
+        }
+        
+        // Tic Tac Toe Game
+        let board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+        let currentPlayer = 'X';
+        let gameOver = false;
+        
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', () => {
+                const index = parseInt(cell.getAttribute('data-index'));
+                if (!gameOver && board[index] === ' ') {
+                    playMove(index);
+                }
+            });
+        });
+        
+        function playMove(position) {
+            board[position] = currentPlayer;
+            
+            // Check for winner
+            const winConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+            
+            let winner = null;
+            for (const condition of winConditions) {
+                if (board[condition[0]] !== ' ' && 
+                    board[condition[0]] === board[condition[1]] && 
+                    board[condition[1]] === board[condition[2]]) {
+                    winner = board[condition[0]];
+                    break;
+                }
+            }
+            
+            // Check for tie
+            if (!winner && !board.includes(' ')) {
+                winner = 'T';
+            }
+            
+            if (winner) {
+                gameOver = true;
+                const statusDiv = document.getElementById('game-status');
+                if (winner === 'T') {
+                    statusDiv.textContent = "It's a tie!";
+                } else {
+                    statusDiv.textContent = `Player ${winner} wins!`;
+                }
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                document.getElementById('game-status').textContent = `Player ${currentPlayer}'s turn`;
+            }
+            
+            updateBoard();
+        }
+        
+        function updateBoard() {
+            document.querySelectorAll('.cell').forEach((cell, index) => {
+                cell.textContent = board[index];
+                if (board[index] === 'X') {
+                    cell.className = 'cell x';
+                } else if (board[index] === 'O') {
+                    cell.className = 'cell o';
+                } else {
+                    cell.className = 'cell';
+                }
+            });
+        }
+        
+        function resetTicTacToe() {
+            board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+            currentPlayer = 'X';
+            gameOver = false;
+            updateBoard();
+            document.getElementById('game-status').textContent = "Player X's turn";
+        }
+        
+        // Guess the Number Game
+        let secretNumber = null;
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function startNewGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('guess-feedback').textContent = `I'm thinking of a number between 1 and 100. You have ${maxAttempts} attempts.`;
+            document.getElementById('guess-history').innerHTML = '';
+            document.getElementById('guess-input').value = '';
+        }
+        
+        function makeGuess() {
+            if (!secretNumber) {
+                startNewGame();
+                return;
+            }
+            
+            const guessInput = document.getElementById('guess-input');
+            const guess = parseInt(guessInput.value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById('guess-feedback').textContent = 'Please enter a number between 1 and 100';
+                return;
+            }
+            
+            attempts++;
+            let feedback = '';
+            let historyClass = '';
+            
+            if (guess < secretNumber) {
+                feedback = `Too low! Attempts: ${attempts}/${maxAttempts}`;
+                historyClass = 'low';
+            } else if (guess > secretNumber) {
+                feedback = `Too high! Attempts: ${attempts}/${maxAttempts}`;
+                historyClass = 'high';
+            } else {
+                feedback = `Congratulations! You guessed it in ${attempts} attempts!`;
+                historyClass = 'win';
+            }
+            
+            document.getElementById('guess-feedback').textContent = feedback;
+            
+            // Add to history
+            const historyItem = document.createElement('div');
+            historyItem.className = `history-item ${historyClass}`;
+            historyItem.textContent = guess;
+            document.getElementById('guess-history').appendChild(historyItem);
+            
+            // Clear input
+            guessInput.value = '';
+            
+            // Check if game is over
+            if (guess === secretNumber || attempts >= maxAttempts) {
+                if (guess !== secretNumber) {
+                    document.getElementById('guess-feedback').textContent = 
+                        `Game over! The number was ${secretNumber}. Attempts: ${attempts}/${maxAttempts}`;
+                }
+                secretNumber = null;
+            }
+        }
+        
+        // Initialize
+        resetTicTacToe();
+        startNewGame();
+    </script>
+</body>
+</html>

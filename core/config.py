@@ -4,7 +4,7 @@ Configuration constants and system-wide settings
 import os
 
 # ============== BLOCKCHAIN CONFIGURATION ==============
-P2P_PORT = 5000
+P2P_PORT = 5001
 RPC_PORT = 5001
 TARGET_VERSION = "4.0.0"
 TARGET_NAME = "COINIUM BLOCKCHAIN"

@@ -1,17 +1,17 @@
 from flask import Flask, jsonify, request
-from flask import render_template  # Import render_template for HTML rendering
-from flask_cors import CORS # Import CORS
+from flask import render_template  
+from flask_cors import CORS 
 from urllib.parse import urlparse
 import requests
 import os
 from uuid import uuid4
-import json # For pretty printing JSON responses and handling requests
+import json 
 
 # Import the blockchain core components
 from blockchain_app import Blockchain, generate_key_pair, DIFFICULTY, MINING_REWARD, sha256_hash, Block, Transaction, UTXO, UTXOPool
 
 app = Flask(__name__)
-CORS(app) # Enable CORS for all routes
+CORS(app) 
 
 # Generate a globally unique address for this node
 node_identifier = str(uuid4()).replace('-', '')
